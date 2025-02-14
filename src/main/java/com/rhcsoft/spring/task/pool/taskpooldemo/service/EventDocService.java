@@ -11,13 +11,9 @@ import org.springframework.stereotype.Service;
 import com.rhcsoft.spring.task.pool.taskpooldemo.document.EventDoc;
 import com.rhcsoft.spring.task.pool.taskpooldemo.document.EventState;
 import com.rhcsoft.spring.task.pool.taskpooldemo.model.EventNotification;
-import com.rhcsoft.spring.task.pool.taskpooldemo.repo.EventDocRepository;
 
 @Service
 public class EventDocService {
-
-    @Autowired
-    private EventDocRepository eventDocRepository;
 
     @Autowired
     private CouchbaseTemplate couchbaseTemplate;
@@ -38,27 +34,27 @@ public class EventDocService {
     }
 
     public void startProcessEvent(String eventId) {
-        EventDoc eventDoc = eventDocRepository.findById(eventId).get();
+        EventDoc eventDoc = couchbaseTemplate.findById(EventDoc.class).one(eventId);
         eventDoc.setState(EventState.IN_PROGRESS);
         eventDoc.setStartedAt(LocalDateTime.now());
         couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofMinutes(5)).one(eventDoc);
     }
 
     public void completeProcessEvent(String eventId) {
-        EventDoc eventDoc = eventDocRepository.findById(eventId).get();
+        EventDoc eventDoc = couchbaseTemplate.findById(EventDoc.class).one(eventId);
         eventDoc.setState(EventState.COMPLETED);
         eventDoc.setCompletedAt(LocalDateTime.now());
         couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofSeconds(10)).one(eventDoc);
     }
 
     public void failProcessEvent(String eventId) {
-        EventDoc eventDoc = eventDocRepository.findById(eventId).get();
+        EventDoc eventDoc = couchbaseTemplate.findById(EventDoc.class).one(eventId);
         eventDoc.setState(EventState.FAILED);
         eventDoc.setCompletedAt(LocalDateTime.now());
         couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofSeconds(120)).one(eventDoc);
     }
 
     public Optional<EventDoc> getEvent(String eventId) {
-        return eventDocRepository.findById(eventId);
+        return Optional.ofNullable(couchbaseTemplate.findById(EventDoc.class).one(eventId));
     }
 }
