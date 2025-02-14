@@ -114,8 +114,8 @@ By configuring appropriate TTL values for different types of events, you can opt
     - Request Body: `EventNotification` JSON object.
     - Response: `EventDoc` JSON object with HTTP status 201 (Created) or 400 (Bad Request).
 
-- **GET /api/data/user/{id}**
-    - Description: Retrieve event data by user ID.
+- **GET /api/data/{id}**
+    - Description: Retrieve event data by event ID.
     - Path Variable: `id` (String)
     - Response: `EventDoc` JSON object with HTTP status 200 (OK) or 404 (Not Found).
 

@@ -47,7 +47,7 @@ public class EventController {
                 });
     }
 
-    @GetMapping("/data/user/{id}")
+    @GetMapping("/data/{id}")
     public ResponseEntity<EventDoc> getData(@PathVariable String id) {
 
         LOGGER.info("Event requested: " + id);
