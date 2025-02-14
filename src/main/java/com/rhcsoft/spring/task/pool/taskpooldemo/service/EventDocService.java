@@ -1,9 +1,11 @@
 package com.rhcsoft.spring.task.pool.taskpooldemo.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.couchbase.core.CouchbaseTemplate;
 import org.springframework.stereotype.Service;
 
 import com.rhcsoft.spring.task.pool.taskpooldemo.document.EventDoc;
@@ -17,6 +19,9 @@ public class EventDocService {
     @Autowired
     private EventDocRepository eventDocRepository;
 
+    @Autowired
+    private CouchbaseTemplate couchbaseTemplate;
+
     public Optional<EventDoc> saveEvent(EventNotification eventNotification) {
 
         EventDoc eventDoc = new EventDoc();
@@ -28,28 +33,29 @@ public class EventDocService {
         eventDoc.setState(EventState.NEW);
 
         // Save the eventNotification to the database
-        return Optional.of(eventDocRepository.save(eventDoc));
+        return Optional
+                .of(couchbaseTemplate.insertById(EventDoc.class).withExpiry(Duration.ofMinutes(10)).one(eventDoc));
     }
 
     public void startProcessEvent(String eventId) {
-        updateEventState(eventId, EventState.IN_PROGRESS);
+        EventDoc eventDoc = eventDocRepository.findById(eventId).get();
+        eventDoc.setState(EventState.IN_PROGRESS);
+        eventDoc.setStartedAt(LocalDateTime.now());
+        couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofMinutes(5)).one(eventDoc);
     }
 
     public void completeProcessEvent(String eventId) {
-        updateEventState(eventId, EventState.COMPLETED);
+        EventDoc eventDoc = eventDocRepository.findById(eventId).get();
+        eventDoc.setState(EventState.COMPLETED);
+        eventDoc.setCompletedAt(LocalDateTime.now());
+        couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofSeconds(10)).one(eventDoc);
     }
 
     public void failProcessEvent(String eventId) {
-        updateEventState(eventId, EventState.FAILED);
-    }
-
-    private void updateEventState(String eventId, EventState state) {
-
         EventDoc eventDoc = eventDocRepository.findById(eventId).get();
-        eventDoc.setState(state);
-
-        // Update the eventNotification in the database
-        eventDocRepository.save(eventDoc);
+        eventDoc.setState(EventState.FAILED);
+        eventDoc.setCompletedAt(LocalDateTime.now());
+        couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofSeconds(120)).one(eventDoc);
     }
 
     public Optional<EventDoc> getEvent(String eventId) {

@@ -72,6 +72,41 @@ The semaphore is configured to allow a single permit for each unique `eventId`, 
 
 You can find the semaphore implementation details in the [`EventDocProcessor`](src/main/java/com/example/poc/EventDocProcessor.java) file.
 
+## Time to Live (TTL) Scenarios in EventDoc
+
+The `EventDoc` class includes a Time to Live (TTL) feature to manage the lifecycle of event documents. This feature ensures that event data is automatically removed after a specified period, helping to manage storage and maintain data relevance.
+
+The TTL feature is implemented using Couchbase's built-in TTL support. When an event document is saved, the TTL value is set, and Couchbase automatically expires the document after the specified duration.
+
+You can find the TTL configuration details in the [`EventDoc`](src/main/java/com/example/poc/EventDoc.java) file.
+
+### Lifecycle
+
+1. **Received Events:**
+    - Use Case: Temporary events that are waiting to be processed
+    - Configuration: When received, the event is set to live for 10 minutes
+
+1. **Under Processing Events:**
+    - Use Case: Events under processing will have the TTL reprogramed to avoid be purged under the processing moment
+    - Configuration: When started been processed, the event is set to live for 5 minutes
+
+1. **Successful Events:**
+    - Use Case: Events processed successfuly can have the TTL with a short value
+    - Configuration: When finishing processing, the event is set to live for 10 seconds
+
+1. **Unuccessful Events:**
+    - Use Case: Events processed unsuccessfuly can have the TTL with a longer value, to help understanding the issue
+    - Configuration: When finishing processing, the event is set to live for 120 seconds
+
+
+### Benefits
+
+- **Automated Cleanup:** Automatically removes outdated event data, reducing manual maintenance.
+- **Storage Management:** Helps manage storage by ensuring only relevant data is retained.
+- **Performance Optimization:** Improves performance by reducing the amount of data that needs to be processed and queried.
+
+By configuring appropriate TTL values for different types of events, you can optimize the application's performance and ensure efficient data management.
+
 ## API Endpoints
 
 - **POST /api/data**
