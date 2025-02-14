@@ -1,13 +1,16 @@
 package com.rhcsoft.spring.task.pool.taskpooldemo.service;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.rhcsoft.spring.task.pool.taskpooldemo.document.EventState;
-
 @Service
 public class EventDocProcessor {
+
+    private static final ConcurrentHashMap<String, Semaphore> semaphoreMap = new ConcurrentHashMap<>();
 
     @Autowired
     private EventDocService service;
@@ -15,18 +18,31 @@ public class EventDocProcessor {
     @Async
     public void processEvent(String eventId) {
 
-        service.updateEventState(eventId, EventState.IN_PROGRESS);
+        Semaphore semaphore = semaphoreMap.computeIfAbsent(eventId, id -> new Semaphore(1));
 
-        service.getEvent(eventId).ifPresentOrElse(eventDoc -> {
-            try {
-                Thread.sleep(5000); // Simula um delay de 5 segundos
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println("Processamento interrompido");
-            }
-            service.updateEventState(eventId, EventState.COMPLETED);
-        }, () -> {
-            service.updateEventState(eventId, EventState.FAILED);
-        });
+        try {
+            semaphore.acquire();
+            service.startProcessEvent(eventId);
+
+            service.getEvent(eventId).ifPresentOrElse(eventDoc -> {
+
+                try {
+                    Thread.sleep(5000); // Simula um delay de 50 segundos
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.out.println("Processamento finalizado");
+                }
+                service.completeProcessEvent(eventId);
+
+            }, () -> {
+
+                service.failProcessEvent(eventId);
+            });
+
+        } catch (InterruptedException e) {
+        } finally {
+            semaphore.release();
+        }
+
     }
 }
