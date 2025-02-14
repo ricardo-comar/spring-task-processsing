@@ -1,7 +1,6 @@
 package com.rhcsoft.spring.task.pool.taskpooldemo.document;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;

@@ -27,7 +27,9 @@ public class EventController {
 
     @PostMapping("/data")
     public ResponseEntity<EventDoc> postData(@RequestBody EventNotification data) {
+
         return eventDocService.saveEvent(data).map(eventDoc -> {
+
             eventDocProcessor.processEvent(data.getEventId());
             return ResponseEntity.status(HttpStatus.CREATED).body(eventDoc);
         })
