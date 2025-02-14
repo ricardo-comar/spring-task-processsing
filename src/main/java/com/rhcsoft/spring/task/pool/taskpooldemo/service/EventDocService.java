@@ -34,24 +34,27 @@ public class EventDocService {
     }
 
     public void startProcessEvent(String eventId) {
-        EventDoc eventDoc = couchbaseTemplate.findById(EventDoc.class).one(eventId);
-        eventDoc.setState(EventState.IN_PROGRESS);
-        eventDoc.setStartedAt(LocalDateTime.now());
-        couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofMinutes(5)).one(eventDoc);
+        getEvent(eventId).ifPresent(eventDoc -> {
+            eventDoc.setState(EventState.IN_PROGRESS);
+            eventDoc.setStartedAt(LocalDateTime.now());
+            couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofMinutes(5)).one(eventDoc);
+        });
     }
 
     public void completeProcessEvent(String eventId) {
-        EventDoc eventDoc = couchbaseTemplate.findById(EventDoc.class).one(eventId);
-        eventDoc.setState(EventState.COMPLETED);
-        eventDoc.setCompletedAt(LocalDateTime.now());
-        couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofSeconds(10)).one(eventDoc);
+        getEvent(eventId).ifPresent(eventDoc -> {
+            eventDoc.setState(EventState.COMPLETED);
+            eventDoc.setCompletedAt(LocalDateTime.now());
+            couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofSeconds(10)).one(eventDoc);
+        });
     }
 
     public void failProcessEvent(String eventId) {
-        EventDoc eventDoc = couchbaseTemplate.findById(EventDoc.class).one(eventId);
-        eventDoc.setState(EventState.FAILED);
-        eventDoc.setCompletedAt(LocalDateTime.now());
-        couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofSeconds(120)).one(eventDoc);
+        getEvent(eventId).ifPresent(eventDoc -> {
+            eventDoc.setState(EventState.FAILED);
+            eventDoc.setCompletedAt(LocalDateTime.now());
+            couchbaseTemplate.replaceById(EventDoc.class).withExpiry(Duration.ofSeconds(120)).one(eventDoc);
+        });
     }
 
     public Optional<EventDoc> getEvent(String eventId) {
