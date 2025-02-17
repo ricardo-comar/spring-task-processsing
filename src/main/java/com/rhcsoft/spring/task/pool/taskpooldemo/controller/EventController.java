@@ -18,6 +18,8 @@ import com.rhcsoft.spring.task.pool.taskpooldemo.model.EventNotification;
 import com.rhcsoft.spring.task.pool.taskpooldemo.service.EventDocProcessor;
 import com.rhcsoft.spring.task.pool.taskpooldemo.service.EventDocService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api")
 public class EventController {
@@ -31,7 +33,7 @@ public class EventController {
     private EventDocProcessor eventDocProcessor;
 
     @PostMapping("/data")
-    public ResponseEntity<EventDoc> postData(@RequestBody EventNotification data) {
+    public ResponseEntity<EventDoc> postData(@Valid @RequestBody EventNotification data) {
 
         LOGGER.info("Event received: " + data.getEventId());
 

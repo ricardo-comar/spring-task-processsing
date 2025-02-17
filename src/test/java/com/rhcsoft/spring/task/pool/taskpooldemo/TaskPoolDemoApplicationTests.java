@@ -101,6 +101,18 @@ class TaskPoolDemoApplicationTests {
 	}
 
 	@Test
+	public void testPostValidation() throws Exception {
+
+		this.mockMvc
+				.perform(
+						MockMvcRequestBuilders.post("/api/data")
+								.content(objectMapper.writeValueAsString(new EventNotification()))
+								.contentType(MediaType.APPLICATION_JSON)
+								.accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest());
+	}
+
+	@Test
 	public void testPostError() throws Exception {
 
 		Mockito.when(eventDocService.saveEvent(Mockito.any(EventNotification.class)))

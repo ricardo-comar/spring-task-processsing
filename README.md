@@ -130,3 +130,4 @@ This project is licensed under the MIT License.
 - https://stackoverflow.com/questions/71155136/spring-boot-java-8-date-time-type-java-time-offsetdatetime-not-supported-by-d
 - https://docs.spring.io/spring-framework/reference/testing/annotations/integration-spring/annotation-mockitobean.html
 - https://www.couchbase.com/blog/how-to-manage-ttl-with-couchbase-n1ql/
+- https://www.baeldung.com/spring-boot-bean-validation
