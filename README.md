@@ -122,3 +122,11 @@ By configuring appropriate TTL values for different types of events, you can opt
 ## License
 
 This project is licensed under the MIT License.
+
+## References
+
+- https://docs.spring.io/spring-framework/reference/integration/scheduling.html 
+- https://springdoc.org/#getting-started
+- https://stackoverflow.com/questions/71155136/spring-boot-java-8-date-time-type-java-time-offsetdatetime-not-supported-by-d
+- https://docs.spring.io/spring-framework/reference/testing/annotations/integration-spring/annotation-mockitobean.html
+- https://www.couchbase.com/blog/how-to-manage-ttl-with-couchbase-n1ql/
