@@ -119,6 +119,36 @@ By configuring appropriate TTL values for different types of events, you can opt
     - Path Variable: `id` (String)
     - Response: `EventDoc` JSON object with HTTP status 200 (OK) or 404 (Not Found).
 
+## Couchbase Eventing
+
+As a technical requirement, every update on document must be notified to an external service. To make it happen, couchbase can be set to execute a function triggered by document edition. 
+
+To obtain the behaviour on this project, you need to access the [`Eventing Page`](http://localhost:8091/ui/index.html#/eventing/summary) and add a new function as described 
+here [`Create an Eventing Function`](https://docs.couchbase.com/server/current/eventing/eventing-lifecycle.html#eventing_examples_preparations), include an URL binding to *http://wiremock:8080* and the content from [`event.js`](./event.js). Then, deploy the function.
+
+After sending an event data (POST /api/data), you should see the content below in docker-compose log. If not, verify the log in Couchbase function link.
+
+```
+wiremock   | 
+wiremock   | 2025-02-19 15:50:45.417 Request received:
+wiremock   | 172.23.0.2 - POST /event
+wiremock   | 
+wiremock   | Host: [wiremock:8080]
+wiremock   | User-Agent: [libcurl/8.9.1-DEV couchbase/evt-7.6.5-5704-ee (eventing)]
+wiremock   | Accept: [*/*]
+wiremock   | Accept-Encoding: [deflate, gzip]
+wiremock   | Content-Type: [application/json]
+wiremock   | Content-Length: [259]
+wiremock   | {"_class":"com.rhcsoft.spring.task.pool.taskpooldemo.document.EventDoc","completedAt":1739980245037,"field1":"string1","field2":"string2","receivedAt":1739980240008,"startedAt":1739980240018,"state":"COMPLETED","userId":"0cC6C1FF-247d-eC13-B72E-90Fe4BE016AD"}
+wiremock   | 
+wiremock   | 
+wiremock   | Matched response definition:
+wiremock   | {
+wiremock   |   "status" : 200
+wiremock   | }
+wiremock   | 
+```
+
 ## License
 
 This project is licensed under the MIT License.
@@ -131,3 +161,7 @@ This project is licensed under the MIT License.
 - https://docs.spring.io/spring-framework/reference/testing/annotations/integration-spring/annotation-mockitobean.html
 - https://www.couchbase.com/blog/how-to-manage-ttl-with-couchbase-n1ql/
 - https://www.baeldung.com/spring-boot-bean-validation
+- https://wiremock.org/docs/request-matching/
+- https://docs.couchbase.com/server/current/eventing/eventing-lifecycle.html
+- https://docs.couchbase.com/server/current/eventing/eventing-curl-spec.html
+

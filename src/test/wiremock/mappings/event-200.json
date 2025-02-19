@@ -1,0 +1,9 @@
+{
+    "request": {
+        "urlPath": "/event",
+        "method": "POST"
+    },
+    "response": {
+        "status": 200
+    }
+}

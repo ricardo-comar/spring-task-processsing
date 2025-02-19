@@ -2,6 +2,7 @@ package com.rhcsoft.spring.task.pool.taskpooldemo;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,10 +41,10 @@ class TaskPoolDemoApplicationTests {
 
 	private EventNotification event = new EventNotification() {
 		{
-			setEventId("123");
+			setEventId(UUID.randomUUID().toString());
 			setUser(new EventUser() {
 				{
-					setId("1");
+					setId(UUID.randomUUID().toString());
 					setName("John Doe");
 				}
 			});

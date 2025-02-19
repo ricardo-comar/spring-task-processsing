@@ -1,5 +1,6 @@
 version: '3.7'
 services:
+
   couchbase:
     image: couchbase:latest
     container_name: couchbase
@@ -14,6 +15,20 @@ services:
       - COUCHBASE_ADMINISTRATOR_PASSWORD=admin123
     networks:
       - couchbase_network
+
+  wiremock:
+    image: "wiremock/wiremock:latest"
+    container_name: wiremock
+    ports:
+      - "8180:8080"  # Web Console
+    volumes:
+      - ./src/test/wiremock/extensions:/var/wiremock/extensions
+      - ./src/test/wiremock/__files:/home/wiremock/__files
+      - ./src/test/wiremock/mappings:/home/wiremock/mappings
+    entrypoint: ["/docker-entrypoint.sh", "--global-response-templating", "--disable-gzip", "--verbose"]      
+    networks:
+      - couchbase_network
+
 networks:
   couchbase_network:
     driver: bridge
